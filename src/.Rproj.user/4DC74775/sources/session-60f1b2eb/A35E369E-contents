@@ -1,0 +1,72 @@
+library(data.table)
+library(Hmisc)
+library(ggplot2)
+library(forcats)
+
+SEP <- "\t"
+SEP2 <- ","
+
+
+DATA <<- "C:/Users/olive/OneDrive/Desktop/COMP3021/datasets/"
+
+pgaDATA <- read.table(paste(DATA, "ASA-All-PGA-Raw-Data-Tourn-Level.csv", sep=""), quote="\"", header=T, comment.char="", sep=SEP2)
+head(pgaDATA)
+
+#Remove features/columns not being used in project
+pgaDATA <- subset(pgaDATA, select = c("Player_initial_last","hole_par","strokes","n_rounds","made_cut","pos","player","date","purse","season","Finish","sg_putt","sg_arg","sg_app","sg_ott","sg_t2g","sg_total"))
+
+
+
+
+
+
+# Question 1: Which is the most important part of the game to gain strokes to win tournaments 
+############################################################################################
+# Filter the data to only include players who finished in 1st place
+data_filtered <- subset(pgaDATA, pos == 1)
+
+# Create the scatter plot
+ggplot(data_filtered, aes(x = sg_putt, y = pos, color = "putting")) +
+  geom_point(position = position_jitter(height = 0.1)) +
+  geom_point(aes(x = sg_arg, color = "around the green"), position = position_jitter(height = 0.1)) +
+  geom_point(aes(x = sg_app, color = "approach shot"), position = position_jitter(height = 0.1)) +
+  geom_point(aes(x = sg_ott, color = "off the tee"), position = position_jitter(height = 0.1)) +
+  geom_point(aes(x = sg_t2g, color = "tee to green"), position = position_jitter(height = 0.1)) +
+  labs(title = "Areas Strokes Gained by Tournament Champions",
+       x = "Strokes Gained",
+       y = "Finishing Position",
+       color = "Aspect of the Game") +
+  scale_color_manual(values = c("putting" = "green",
+                                "around the green" = "blue",
+                                "approach shot" = "red",
+                                "off the tee" = "orange",
+                                "tee to green" = "purple"))
+
+#Question2: Does a larger purse size result in better player performance?
+########################################################################
+breaks <- c(0, 2, 4, 6, 8, 10, 12)
+
+# create labels for purse ranges
+labels <- c("0-2", "2-4", "4-6", "6-8", "8-10", "10-12")
+
+# categorize purse values into ranges and compute the average total strokes gained
+filt_data$purse_range <- cut(filt_data$purse, breaks = breaks, labels = labels)
+df_avg <- aggregate(sg_total ~ purse_range, data = filt_data, FUN = mean)
+
+# create bar plot with average total strokes gained
+ggplot(data = df_avg, aes(x = purse_range, y = sg_total)) + 
+  geom_bar(stat = "identity", fill = "blue") +
+  xlab("Purse Range") +
+  ylab("Average Total Strokes Gained") +
+  ggtitle("Average Total Strokes Gained by Purse Range")
+
+#Is SG a good representative of performance?
+pgaDATA$pos <- reorder(pgaDATA$pos, -pgaDATA$sg_total)
+
+ggplot(pgaDATA, aes(y = sg_total, x = pos, color = "Total strokes gained")) +
+  geom_point() +
+  labs(title = "Areas Strokes Gained by Tournament Champions",
+       y = "Total Strokes Gained",
+       x = "Finishing Position",
+       color = "Key") +
+  scale_color_manual(values = c("Total strokes gained" = "green"))

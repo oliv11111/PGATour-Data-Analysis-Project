@@ -1,0 +1,182 @@
+library(data.table)
+library(Hmisc)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(reshape2)
+
+SEP <- "\t"
+SEP2 <- ","
+DATA <<- "data/"
+pgaDATA <- read.table(paste(DATA, "ASA-All-PGA-Raw-Data-Tourn-Level.csv", sep=""), quote="\"", header=T, comment.char="", sep=SEP2)
+
+#Data Cleaning
+##############
+
+#Remove features/columns not being used in project
+pgaDATA <- subset(pgaDATA, select = c("hole_par","strokes","made_cut","pos","player","date","purse","season","sg_putt","sg_arg","sg_app","sg_ott","sg_t2g","sg_total","course"))
+head(pgaDATA)
+describe(pgaDATA)
+
+
+#Initial Questions
+##################
+#Question 1: Is strokes gained a good representative of performance?
+###################################################################
+noncut_pgaDATA <- na.omit(pgaDATA)
+noncut_pgaDATA <- noncut_pgaDATA %>% filter(pos != 999)
+
+q1 <- ggplot(noncut_pgaDATA, aes(x = pos, y = sg_total, color = case_when(
+  pos == 1 ~ "1st",
+  pos == 2 ~ "2nd",
+  pos == 3 ~ "3rd",
+  TRUE ~ "Rest of field"))) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "red", fullrange = TRUE) +
+  labs(x = "Finishing Position", y = "Strokes Gained", color = "Position") +
+  ggtitle("Relationship Between Total Strokes Gained with Finishing Positon") +
+  scale_color_manual(values = c("1st" = "gold", "2nd" = "grey70", "3rd" = "#CD7F32", "Rest of field" = "black")) +
+  theme_bw()
+
+q1
+ggsave("q1.png", q1)
+
+#Question2: Does a larger purse size result in better player performance?
+#########################################################################
+# create breaks and labels for purse ranges
+breaks <- c(0,2, 4, 6, 8, 10, 12, 14, 16, 18, 20)
+labels <- c("0-2", "2-4", "4-6", "6-8", "8-10", "10-12", "12-14", "14-16", "16-18", "18-20")
+
+# categorize purse values into ranges and compute the average total strokes gained
+pgaDATA$purse_range <- cut(pgaDATA$purse, breaks = breaks, labels = labels)
+sg_total_avg_purse <- aggregate(sg_total ~ purse_range, data = pgaDATA, FUN = mean)
+
+
+# create bar plot with average total strokes gained
+q2 <- ggplot(sg_total_avg_purse, aes(x = purse_range, y = sg_total, fill = sg_total)) + 
+        geom_bar(stat = "identity") +
+        labs(x = "Purse $(m)", y = "Average Total Strokes Gained", fill = "Strokes Gained") +
+        ggtitle("Average Total Strokes Gained by Purse Range") +
+        scale_fill_gradient(low = "red", high = "blue") +
+        theme_bw()
+q2
+ggsave("q2.png", q2)
+
+
+
+
+#Question 3: Which seasons did players score the best?
+######################################################
+#Creating score attribute
+pgaDATA$score <- pgaDATA$strokes - pgaDATA$hole_par
+
+#Calculate the mean score for each season
+avg_scores <- pgaDATA %>% group_by(season) %>% 
+  summarize(avg_score = mean(score))
+
+#Create the bar plot
+q3 <- ggplot(avg_scores, aes(x = season, y = avg_score, fill = avg_score)) +
+        geom_bar(stat = "identity", position = "identity") +
+        labs(x = "Season", y = "Average Score", fill = "Score") +
+        ggtitle("Average Score by Season") +
+        scale_fill_gradient(low = "blue", high = "red") +
+        theme_bw()
+
+q3
+ggsave("q3.png", q3)
+
+#Question 4: What is the proportion of players who scored under par, even par and over par??
+########################################################
+# Create a data frame with the counts of each category
+score_counts <- pgaDATA %>% 
+  summarize(score_category = case_when(
+    score < 0 ~ "Under Par",
+    score == 0 ~ "Par",
+    score > 0 ~ "Over Par"
+  )) %>% 
+  count(score_category) %>% 
+  rename(Category = score_category, Count = n) %>% 
+  mutate(percentage = Count / sum(Count) * 100)
+
+# Create the pie chart
+q4 <- ggplot(score_counts, aes(x="", y=Count, fill=Category)) +
+        geom_bar(stat="identity", width=0.6, color="white") +
+        coord_polar(theta = "y", start = 0) +
+        ggtitle("Proportion of Players by Score Category") +
+        scale_fill_manual(values = c("Under Par" = "green", "Par" = "grey50", "Over Par" = "red")) +
+        annotate("text", x=0, y=0, label=paste0("Total Count: ", total_count), size=4, color="black") +
+        geom_text(aes(label = paste0(sprintf("%.1f", percentage), "%")),
+                  position = position_stack(vjust = 0.5), color = "white") +
+        theme_void() 
+  
+q4
+ggsave("q4.png", q4)
+
+
+#Further Questions
+##################
+#Question 1:What is the most important aspect of a players game to gain strokes to win tournaments
+##################################################################################################
+# Filter the data to only include players who finished in 1st place
+pos1DATA <- subset(pgaDATA, pos == 1)
+
+
+# Create a new data frame with the selected attributes
+sg_data <- pos1DATA[,c("sg_putt", "sg_app", "sg_t2g", "sg_ott", "sg_arg")]
+
+gathered_sg_data <- gather(sg_data, key = "Attribute", value = "Value")
+
+
+# Create the boxplot
+fq1 <- ggplot(gathered_sg_data, aes(x = Attribute, y = Value, fill = Attribute)) +
+  geom_boxplot(color = "black", alpha = 0.8) +
+  coord_flip() +
+  labs(x = "Aspect of Game", y = "Strokes Gained", fill = "Aspect of Game") +
+  ggtitle("Strokes Gained by Aspect of Game for 1st Place Finishers") +
+  scale_x_discrete(labels = c("Approach shot", "Around the green", "Of the tee", "Putting", "Tee to green")) +
+  scale_fill_manual(values = c("lightblue", "pink", "lightgreen", "purple", "orange"),
+                    labels = c("Approach shot", "Around the green", "Of the tee", "Putting", "Tee to green")) +
+  theme_bw()
+
+
+fq1
+
+ggsave("fq1.png", fq1)
+
+
+
+
+
+
+#Question 2: "How do strokes gained in different shot categories compare between 
+#tournaments with the highest purse range and tournaments with other purse ranges?"
+##################################################################################
+data_filtered <- pgaDATA %>% 
+  filter(!is.na(sg_putt), !is.na(sg_arg), !is.na(sg_app), !is.na(sg_ott), !is.na(sg_t2g)) %>%
+  mutate(purse_range_new = ifelse(purse_range == "18-20", "18-20", "Other"))
+
+# group by purse range and compute the means of the variables of interest
+data_grouped <- data_filtered %>% 
+  group_by(purse_range_new) %>% 
+  summarize(mean_sg_putt = mean(sg_putt),
+            mean_sg_arg = mean(sg_arg),
+            mean_sg_app = mean(sg_app),
+            mean_sg_ott = mean(sg_ott),
+            mean_sg_t2g = mean(sg_t2g))
+
+  
+
+# melt the data so that it is in a long format
+data_melted <- melt(data_grouped, id.vars = "purse_range_new", variable.name = "sg_category", value.name = "mean_sg")
+
+# create a bar plot
+fq2 <- ggplot(data_melted, aes(x = purse_range_new, y = mean_sg, fill = sg_category)) +
+        geom_bar(stat = "identity", position = "dodge") +
+        labs(x = "Purse Range", y = "Average Strokes Gained", fill = "Shot Category") +
+        ggtitle("Comparison of strokes gained by shot category and in the highest purse tournements against the rest") +
+        scale_fill_manual(values = c("purple", "pink", "lightblue", "lightgreen", "orange"),
+                          labels = c("Putting", "Around the green", "Approach Shot", "Off the Tee", "Tee to green")) +
+        theme_bw()
+fq2
+ggsave("fq2.png", fq2, width = 10)
+

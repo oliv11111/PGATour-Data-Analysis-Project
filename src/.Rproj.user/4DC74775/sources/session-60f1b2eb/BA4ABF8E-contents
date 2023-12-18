@@ -1,0 +1,23 @@
+library(data.table)
+SEP <- "\t"
+SEP2 <- ","
+DATA <<- "C:/Users/olive/OneDrive/Desktop/COMP3021/datasets/"
+pgaDATA <- read.table(paste(DATA, "ASA All PGA Raw Data - Tourn Level", sep=""), quote="\"", header=T, comment.char="", sep=SEP2)
+head(pgaDATA)
+DATA <<- "C:/Users/olive/OneDrive/Desktop/COMP3021/datasets/"
+pgaDATA <- read.table(paste(DATA, "ASA-All-PGA-Raw-Data-Tourn-Level", sep=""), quote="\"", header=T, comment.char="", sep=SEP2)
+pgaDATA <- read.table(paste(DATA, "ASA-All-PGA-Raw-Data-Tourn-Level.csv", sep=""), quote="\"", header=T, comment.char="", sep=SEP2)
+head(pgaDATA)
+di <-  describe(pgaDATA)
+library(Hmisc)
+ta.table)
+ta.table)
+library(data.table)
+library(Hmisc)
+SEP <- "\t"
+SEP2 <- ","
+DATA <<- "C:/Users/olive/OneDrive/Desktop/COMP3021/datasets/"
+pgaDATA <- read.table(paste(DATA, "ASA-All-PGA-Raw-Data-Tourn-Level.csv", sep=""), quote="\"", header=T, comment.char="", sep=SEP2)
+head(pgaDATA)
+di <-  describe(pgaDATA)
+di
