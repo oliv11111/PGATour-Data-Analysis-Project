@@ -1,64 +1,60 @@
-# PGA Tour Analysis
+# PGA Tour Data Analysis Project in R
 
-## Overview
+## Table of Contents
+- [Description](#description)
+- [What it Does](#what-it-does)
+- [Project Objectives](#project-objectives)
+- [Key Findings](#key-findings)
+- [Installation](#installation)
+- [License](#license)
 
-This repository contains an analysis of PGA tour data spanning the 2015-2022 seasons. The dataset provides insights into player performance, strokes gained metrics, and various aspects of the game.
+## Description
+A data analysis project from my final year of university at the Univeristy of Nottingham, Computer Science. 
 
-## Background Information
+### What it does
+This project delves into the world of professional golf through a comprehensive analysis of PGA tour data spanning the 2015-2022 seasons. Leveraging R programming, the analysis focuses on key performance indicators, strokes gained metrics, and various facets of player success in elite-level tournaments.
 
-The PGA tour is renowned as the premier professional golf tour, attracting elite players. The dataset includes information on player names, tournament details, course names, purse sizes, and player performance metrics such as strokes gained in different aspects of the game.
 
-## Objective
+### Project Objectives
+- Understand Player Performance: Explore and understand the performance of players on the PGA tour, unraveling insights into their strengths and weaknesses.
 
-The primary goal is to analyze player performance on the PGA tour and answer key questions related to strokes gained, purse sizes, seasons, and scoring categories. The analysis aims to provide insights into the factors influencing player success.
+- Evaluate Strokes Gained: Assess the effectiveness of the widely-used strokes gained metric as a measure of player performance and its correlation with finishing positions.
 
-## Data Features
+- Impact of Purse Size: Investigate the relationship between tournament purse sizes and player performance, uncovering patterns in higher-stake tournaments.
 
-- **Player_inital_last**: Player name in the format (first name initial).(surname)
-- **tournamentID**: Identifier for the tournament
-- **hole_par**: Total par of the holes played
-- **strokes**: Strokes made by the player
-- ... (other variables not used in the analysis)
+- Seasonal Trends: Identify trends in player scoring across seasons, shedding light on variations in performance over the years.
 
-## Understanding Golf/Data/Problem
+- Scoring Categories: Analyze the proportion of players scoring under par, even par, and over par, providing a holistic view of scoring trends.
 
-A basic understanding of golf is necessary to interpret the strokes gained metrics, scoring system, and tournament format. The README provides a brief overview of scoring in golf and explains the strokes gained metric used in the analysis.
 
-## Data Cleaning
+### Key Findings
+- Strokes Gained Validity: Strokes gained proves to be a reliable metric for evaluating player performance, with a clear correlation with finishing positions.
 
-The dataset was transformed to focus on relevant data, removing unnecessary attributes. Cleaning involved handling missing values and outliers to ensure data integrity.
+- Purse Size Impact: Higher purse sizes do not necessarily translate to better player performance, with a notable drop in results in the highest-stake tournaments.
 
-## Initial Questions Explored
+- Seasonal Variations: Seasons exhibit different player scoring trends, with variations in average scores and notable performance disparities.
 
-### Q1: Is Strokes Gained a Good Metric for Evaluating Performance?
+- Scoring Categories Overview: The proportion of players scoring under par, even par, and over par provides a comprehensive snapshot of player performance trends.
 
-A scatter plot compares total strokes gained with finishing performance, suggesting that better finishing positions tend to gain more strokes.
+- Importance of "Tee to Green": For tournament champions, the most critical aspect contributing to strokes gained is the "tee to green" performance.
 
-### Q2: Does a larger purse size result in better player performance?
+## Installation
+To run the R projcet, follow these installation steps:
 
-A bar plot investigates the relationship between purse size and average total strokes gained, revealing a drop in performance in the highest stake tournaments.
+1. Clone the repository to your local machine.
+    ```bash
+    git clone https://github.com/oliv11111/PGATour-Data-Analysis-Project.git
+    ```
 
-### Q3: Which seasons did players score the best?
+2. Navigate to the project directory.
+    ```bash
+    cd PGATour-Data-Analysis-Project
+    ```
 
-A bar plot compares mean scores by season, identifying variations in player performance across seasons.
+3. Run the R Script. 
+    ```bash
+    
+    ```
 
-### Q4: What is the proportion of players who scored under par, even par, and over par?
-
-A pie/donut chart visualizes the proportion of players in each scoring category across seasons.
-
-## Further Questions Explored
-
-### FQ1: Which is the most important part of the game to gain strokes to win tournaments?
-
-A boxplot explores strokes gained by different aspects of the game for 1st place finishers, revealing "tee to green" as the most crucial aspect.
-
-### FQ2: How do strokes gained in different shot categories compare between tournaments with the highest purse range and tournaments with other purse ranges?
-
-A dodged bar plot compares strokes gained in different shot categories between high purse tournaments and others, highlighting a significant decrease in "tee to green" performance in high-stake tournaments.
-
-## Reflection
-
-The project successfully explores the PGA tour dataset, revealing insights into player performance and factors influencing success. While strokes gained proves to be a valuable metric, limitations include the absence of specific golf course data. The visualizations effectively communicate findings, ensuring clarity and expressiveness.
-
-For detailed analysis and visualizations, refer to the Jupyter notebook in this repository.
-```
+## License
+This project is licensed under the [MIT License](LICENSE). You can find more details in the `LICENSE` file.
